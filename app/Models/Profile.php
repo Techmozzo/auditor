@@ -10,8 +10,10 @@ class Profile extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'auditor_profiles';
+
     protected $fillable = [
-        'title', 'first_name', 'last_name', 'middle_name', 'phone', 'identification', 'avatar', 'gender', 'country_of_origin', 'date_of_birth', 'occupation', 'marital_status', 'user_id', 'user_type'
+        'title', 'first_name', 'last_name', 'middle_name', 'phone', 'identification', 'avatar', 'gender', 'country_of_origin', 'date_of_birth', 'occupation', 'marital_status', 'auditor_id'
     ];
 
 }

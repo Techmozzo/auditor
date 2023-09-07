@@ -41,7 +41,7 @@ class AddAuditorJob implements ShouldQueue
         $body = $this->admin->company->name ." Has created a profile for you on Audit Confirmation Platform.
             Here is a default password created for your login access
             <br/> <strong>" . $this->password ."</strong>
-            <br/><br/><b><a href=".env('PP_URL').">Start Now</a></b><br />
+            <br/><br/><b><a href=".config('app.url').">Start Now</a></b><br />
             If the button doesn't work, copy and paste the URL in your browser's address bar: <br /> <br />
             <br/><br/>Reach out to Techmozzo Support if you have any complaints or enquiries. <br/><br/> Thanks.";
         Mail::to($this->auditor->email)->send(new SendMail($this->auditor->name(), $subject, $heading, $body));

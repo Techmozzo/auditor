@@ -62,8 +62,12 @@
                                     settings</i></a>
                             <a class="control-item" href="{{ route('help-center') }}"><i class="material-icons">
                                     email</i></a>
-                            <a class="control-item" href="{{ route('logout') }}"><i
+                            <a class="control-item"href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form-2').submit();"><i
                                     class="material-icons">exit_to_app</i></a>
+                            <form id="logout-form-2" action="{{ route('logout') }}" method="POST">
+                                @csrf
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -243,8 +247,8 @@
                                 @endswitch
 
                                 @can('admin')
-                                    <a class="btn btn-opacity-primary btn-sm mr-2"
-                                    href="{{ route('auditors.create') }}">Add Auditor </a>
+                                    <a class="btn btn-opacity-primary btn-sm mr-2" href="{{ route('auditors.create') }}">Add
+                                        Auditor </a>
                                 @endcan
                             </div>
                         </div>

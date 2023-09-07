@@ -29,7 +29,7 @@ class HomeController extends Controller
             return view('home.auditor', compact('auditor', 'confirmation_request'));
         }
         $number_of_auditors = Auditor::where('company_id', $auditor->company_id)->count();
-        $pending_request  = ConfirmationRequest::where([['confirmation_status', 0], ['company_id', $auditor->company_id]])->get();
-        return view('home.admin', compact('number_of_auditors', 'pending_request', 'auditor'));
+        $pending_requests = ConfirmationRequest::where([['confirmation_status', 0], ['company_id', $auditor->company_id]])->latest()->get();
+        return view('home.admin', compact('number_of_auditors', 'pending_requests', 'auditor'));
     }
 }

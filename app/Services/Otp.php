@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Jobs\SendOtpViaEmailJob;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Log;

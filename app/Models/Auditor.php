@@ -19,7 +19,7 @@ class Auditor extends Authenticatable
      * @var array
      */
     protected $fillable = [
-         'email' ,'phone', 'password','role_id', 'verified', 'is_blocked', 'company_id', 'is_verified'
+         'email' ,'phone', 'password','role_id', 'email_verified_at', 'is_blocked', 'company_id', 'is_verified'
     ];
 
     /**

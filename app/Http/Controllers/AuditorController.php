@@ -28,12 +28,12 @@ class AuditorController extends Controller
     public function store(AuditorRequest $request)
     {
         $admin = auth()->user();
-        $password = Hash::make(Str::random(8));
+        $password = Str::random(8);
         try {
             DB::beginTransaction();
             $auditor = Auditor::create([
                 'email' => $request->email,
-                'password' => $password,
+                'password' => Hash::make($password),
                 'role_id' => $request->role,
                 'company_id' => $admin->company_id,
                 'is_verified' => 1
@@ -43,8 +43,7 @@ class AuditorController extends Controller
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'phone' => $request->phone,
-                'user_type' => Types::Users['auditor'],
-                'user_id' => $auditor->id
+                'auditor_id' => $auditor->id,
             ]);
             AddAuditorJob::dispatch($admin, $auditor, $password);
             EmailVerificationJob::dispatch($auditor);

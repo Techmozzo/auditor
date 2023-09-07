@@ -18,7 +18,7 @@
         <div data-perfect-scrollbar='' data-suppress-scroll-x='true'>
             <div class="d-flex flex-column align-items-center mt-lg mb-xxl">
                 <a href="{{ route('register') }}"><img class="card-img-top signup"
-                        src="/dashboard/dist/assets/images/logo.svg" style="height: 100px" alt="Bank Logo"></a>
+                        src="/dashboard/dist/assets/images/logo.svg" style="height: 100px" alt="App Logo"></a>
                 {{-- <span class="text-primary text-18 d-block font-weight-bold"> Arctic Admin </span> --}}
                 <span class="mb-md text-muted mb-lg d-block">Sign in to your account</span>
                 @include('layouts.message')

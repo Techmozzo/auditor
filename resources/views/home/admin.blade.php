@@ -66,7 +66,7 @@
                                             <div>
                                                 <p class="m-0">Pending request</p>
                                                 <div class="card-title m-0">
-                                                    {{ $pending_request->count() }}</div>
+                                                    {{ $pending_requests->count() }}</div>
                                             </div>
                                             <i class="material-icons text-warning">pending_actions</i>
                                         </div>
@@ -91,43 +91,58 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        {{-- @if ($user->transactions->count() > 0)
+                        @if ($pending_requests->count() > 0)
                             <table class="table nowrap" id="datatableScrollXY" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Transaction Date</th>
-                                        <th>Account</th>
-                                        <th>Narrative</th>
-                                        <th>Credit</th>
-                                        <th>Debit</th>
-                                        <th>Status</th>
+                                        <th>Name</th>
+                                        <th>Period</th>
+                                        <th>Initiator</th>
+                                        <th>Authorization</th>
+                                        <th>Confirmation</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $index = 1; @endphp
-                                    @foreach ($transactions as $transaction)
+                                    @foreach ($pending_requests as $request)
                                         <tr>
-                                            <td data-sort="YYYYMMDD">{{ $transaction->created_at->format('m-d-Y') }}</td>
-                                            <td>{{ $transaction->account->number }}</td>
-                                            <td>{!! $transaction->narrative !!}</td>
-                                            <td class="text-success">{{ $transaction->entry == 'credit' ?  number_format($transaction->amount, 2) : '' }}</td>
-                                            <td class="text-danger">{{ $transaction->entry == 'debit' ?  number_format($transaction->amount, 2) : '' }}</td>
+                                            <td>{{ $request->name }}</td>
+                                            <td>{{ getPeriodDayAndMonth($request->opening_period) . ' ' . getYearsRangeInStringFormat(getYearsInRange($request->opening_period, $request->closing_period)) }}
+                                            </td>
+                                            <td>{{ $request->auditor->name() }}</td>
                                             <td>
-                                                @if ($transaction->status == 0)
+                                                @if ($request->authorization_status == 0)
                                                     <span class="badge badge-warning">Pending</span>
-                                                @elseif ($transaction->status == 1)
-                                                    <span class="badge badge-success">Completed</span>
-                                                @else
-                                                    <span class="badge badge-danger">Failed</span>
+                                                @elseif ($request->authorization_status == 1)
+                                                    <span class="badge badge-success">Authorized</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                @if ($request->confirmation_status == 0)
+                                                    <span class="badge badge-warning">Pending</span>
+                                                @elseif ($request->confirmation_status == 1)
+                                                    <span class="badge badge-success">Completed</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ url('/confirmation-requests/' . encrypt_helper($request->id) . '/edit') }}"
+                                                    title="Edit request"><span class="material-icons">edit_note</span></a>
+                                                &nbsp;
+                                                <a class="text-primary" href="{{route('confirmation-requests.show', encrypt_helper($request->id))}}"
+                                                    title="View request"><span
+                                                        class="material-icons">visibility</span></a>
+                                                &nbsp;
+                                                <a class="delete-item text-danger"
+                                                    data-id="{{ encrypt_helper($request->id) }}" href="#"
+                                                    title="Delete request"><span class="material-icons">delete</span></a>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         @else
-                            <div class="text-danger"> You don't have any Transaction.</div>
-                        @endif --}}
+                            <div class="text-danger"> There is no pending request.</div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -142,7 +157,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="loginModal">Account Security Hint</h4>
+                    <h4 class="modal-title" id="loginModal">Security Hint</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -156,9 +171,7 @@
                             <div class="col-md-10 offset-md-1 mb-sm mt-lg">
                                 <strong>Please do not share the following with anyone : </strong>
                                 <ul>
-                                    <li class="pt-sm">Internet and Mobile banking login details, password, or secret
-                                        question and answer.</li>
-                                    <li class="pt-sm">Debit/Prepaid card numbers and pin.</li>
+                                    <li class="pt-sm">Application login details, password, or token.</li>
                                     <li class="pt-sm">One time OTP or secured passcode.</li>
                                 </ul>
                             </div>

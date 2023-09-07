@@ -162,7 +162,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="loginModal">Account Security Hint</h4>
+                    <h4 class="modal-title" id="loginModal">Security Hint</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -176,9 +176,7 @@
                             <div class="col-md-10 offset-md-1 mb-sm mt-lg">
                                 <strong>Please do not share the following with anyone : </strong>
                                 <ul>
-                                    <li class="pt-sm">Internet and Mobile banking login details, password, or secret
-                                        question and answer.</li>
-                                    <li class="pt-sm">Debit/Prepaid card numbers and pin.</li>
+                                    <li class="pt-sm">Application login details, password, or token.</li>
                                     <li class="pt-sm">One time OTP or secured passcode.</li>
                                 </ul>
                             </div>
@@ -192,6 +190,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 @section('script')
     <script src="/dashboard/dist/assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
