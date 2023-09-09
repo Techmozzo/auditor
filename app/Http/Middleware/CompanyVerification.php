@@ -19,7 +19,7 @@ class CompanyVerification
     {
         if(Gate::denies('is_company_verified')){
             auth()->logout();
-            return redirect()->route('login')->with('error', 'Sorry you firm is not verified. Please contact customer service if there is any error in this notice. Thank you.');
+            return redirect()->route('login')->with('error', 'Sorry your firm is not verified. Please contact customer service if there is any error in this notice. Thank you.');
         }
         return $next($request);
     }

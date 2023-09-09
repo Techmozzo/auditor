@@ -19,7 +19,7 @@
                                             <div>
                                                 <p class="m-0">Welcome,</p>
                                                 <div class="card-title m-0">
-                                                    {{ $user->name() }}</div>
+                                                    {{ $auditor->name() }}</div>
                                             </div>
 
                                             @if ($auditor->is_verified == 1)
@@ -38,11 +38,11 @@
                                         <div
                                             class="ul-cryptocurrency-card d-flex flex-grow-1 justify-content-between align-items-center">
                                             <div>
-                                                <p class="m-0">Num. of Accounts</p>
+                                                <p class="m-0">Num. of Pending Requests</p>
                                                 <div class="card-title m-0">
-                                                    45</div>
+                                                    {{$number_of_pending_requests}}</div>
                                             </div>
-                                            <i class="material-icons">manage_accounts</i>
+                                            <i class="material-icons text-warning">pending_actions</i>
                                         </div>
                                     </div>
                                 </div>
@@ -68,86 +68,74 @@
                 </div>
             </div>
 
-            {{-- @if ($user->accounts->count() > 0)
-                @foreach ($user->accounts as $account)
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-12 mb-md">
-                                <div class="row">
-                                    <div class="col-lg-12 mb-md">
-                                        <div class="card bg-default h-100">
-                                            <div class="card-body d-flex align-items-center">
-                                                <div
-                                                    class="ul-cryptocurrency-card d-flex flex-grow-1 justify-content-between align-items-center">
-                                                    <div>
-                                                        <p class="m-0">{{$account->number}} <span
-                                                            class="badge {{ $account->is_active ? 'badge-success' : 'badge-danger' }}">{{ $account->is_active ? 'Active' : 'Inactive' }}</span></p>
-                                                        <div class="card-title m-0">
-                                                            {{ $account->currency->name .' '. $account->type->name .' Account'}}</div>
-                                                    </div>
-                                                    <div> Bal. <strong>{{$account->currency->symbol}}@format_amount($account->balance)</strong> <br > Book Bal. <strong>{{$account->currency->symbol}}@format_amount($account->book_balance)</strong> </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <div class="text-danger"> You don't have an account.</div>
-            @endif --}}
-
-            {{-- <div class="col-lg-8">
-            </div>
-
-            <div class="col-lg-4 mb-md">
-            </div> --}}
-
             <div class="col-lg-12 mb-md">
-                <div class="card-header">
-                    <h2 class="p-1 m-0 text-16 font-weight-semi">Mini Account Statement</h2>
+                <div class="card-header d-flex jusitify-space-between">
+                    <h2 class="p-1 m-0 text-16 font-weight-semi">Confirmation Request</h2>
+                    <div class="flex-grow-1"></div>
+                    <div>
+                        <a type="button" class="btn btn-opacity btn-primary btn-sm my-sm mr-sm"
+                            href="{{ route('confirmation-requests.create') }}" title="Create Request">Create Request</a>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        {{-- @if ($user->transactions->count() > 0)
+                        @if ($confirmation_requests->count() > 0)
                             <table class="table nowrap" id="datatableScrollXY" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Transaction Date</th>
-                                        <th>Account</th>
-                                        <th>Narrative</th>
-                                        <th>Credit</th>
-                                        <th>Debit</th>
-                                        <th>Status</th>
+                                        <th>Name</th>
+                                        <th>Period</th>
+                                        <th>Initiator</th>
+                                        <th>Authorization</th>
+                                        <th>Confirmation</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $index = 1; @endphp
-                                    @foreach ($transactions as $transaction)
+                                    @foreach ($confirmation_requests as $request)
                                         <tr>
-                                            <td data-sort="YYYYMMDD">{{ $transaction->created_at->format('m-d-Y') }}</td>
-                                            <td>{{ $transaction->account->number }}</td>
-                                            <td>{!! $transaction->narrative !!}</td>
-                                            <td class="text-success">{{ $transaction->entry == 'credit' ?  number_format($transaction->amount, 2) : '' }}</td>
-                                            <td class="text-danger">{{ $transaction->entry == 'debit' ?  number_format($transaction->amount, 2) : '' }}</td>
+                                            <td>{{ $request->name }}</td>
+                                            <td>{{ getPeriodDayAndMonth($request->opening_period) . ' ' . getYearsRangeInStringFormat(getYearsInRange($request->opening_period, $request->closing_period)) }}
+                                            </td>
+                                            <td>{{ $request->auditor->name() }}</td>
                                             <td>
-                                                @if ($transaction->status == 0)
+                                                @switch($request->authorization_status)
+                                                    @case($request->authorization_status = 'APPROVED')
+                                                        <span class="badge badge-success">Authorized</span>
+                                                    @break
+                                                    @case($request->authorization_status = 'CANCELLED')
+                                                        <span class="badge badge-danger">Authorized</span>
+                                                    @break
+                                                    @default
+                                                        <span class="badge badge-warning">Pending</span>
+                                                @endswitch
+                                            </td>
+                                            <td>
+                                                @if ($request->confirmation_status == 0)
                                                     <span class="badge badge-warning">Pending</span>
-                                                @elseif ($transaction->status == 1)
+                                                @elseif ($request->confirmation_status == 1)
                                                     <span class="badge badge-success">Completed</span>
-                                                @else
-                                                    <span class="badge badge-danger">Failed</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ url('/confirmation-requests/' . encrypt_helper($request->id) . '/edit') }}"
+                                                    title="Edit request"><span class="material-icons">edit_note</span></a>
+                                                &nbsp;
+                                                <a class="text-primary" href="{{route('confirmation-requests.show', encrypt_helper($request->id))}}"
+                                                    title="View request"><span
+                                                        class="material-icons">visibility</span></a>
+                                                &nbsp;
+                                                <a class="delete-item text-danger"
+                                                    data-id="{{ encrypt_helper($request->id) }}" href="#"
+                                                    title="Delete request"><span class="material-icons">delete</span></a>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         @else
-                            <div class="text-danger"> You don't have any Transaction.</div>
-                        @endif --}}
+                            <div class="text-danger"> There is no pending request.</div>
+                        @endif
                     </div>
                 </div>
             </div>

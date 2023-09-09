@@ -10,7 +10,7 @@
             <div class="flex-grow-1"></div>
             <div>
                 <a type="button" class="btn btn-opacity btn-primary btn-sm my-sm mr-sm"
-                    href="{{ route('confirmation-requests.index') }}" title="Back">Back</a>
+                    href="{{ (auth()->user()->hasRole('admin')) ? route('confirmation-requests.index') :  route('home') }}" title="Back">Back</a>
             </div>
         </div>
         <div class="doc-example d-flex justify-content-center">

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Interfaces\Types;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -60,11 +59,11 @@ class Auditor extends Authenticatable
 
 
     public function address(){
-        return $this->hasOne(Address::class, 'user_id')->where('user_type', Types::Users['auditor']);
+        return $this->hasOne(Address::class, 'auditor_id');
     }
 
     public function profile(){
-        return $this->hasOne(Profile::class, 'user_id')->where('user_type', Types::Users['auditor']);
+        return $this->hasOne(Profile::class, 'auditor_id');
     }
 
     public function company(){

@@ -88,7 +88,8 @@ class RegisterController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'role_id' => $role->id,
-                'company_id' => $company->id
+                'company_id' => $company->id,
+                'is_verified' => 1
             ]);
 
             $company->update(['administrator_id' => $auditor->id]);
@@ -97,7 +98,6 @@ class RegisterController extends Controller
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
                 'phone' => $data['phone'],
-                'user_type' => Types::Users['auditor']
             ]);
 
             DB::commit();

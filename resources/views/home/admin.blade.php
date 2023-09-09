@@ -86,8 +86,13 @@
             </div> --}}
 
             <div class="col-lg-12 mb-md">
-                <div class="card-header">
+                <div class="card-header d-flex jusitify-space-between">
                     <h2 class="p-1 m-0 text-16 font-weight-semi">Pending Confirmation Reqeuests</h2>
+                    <div class="flex-grow-1"></div>
+                    <div>
+                        <a type="button" class="btn btn-opacity btn-primary btn-sm my-sm mr-sm"
+                            href="{{ route('confirmation-requests.create') }}" title="Create Request">Create Request</a>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -111,11 +116,16 @@
                                             </td>
                                             <td>{{ $request->auditor->name() }}</td>
                                             <td>
-                                                @if ($request->authorization_status == 0)
-                                                    <span class="badge badge-warning">Pending</span>
-                                                @elseif ($request->authorization_status == 1)
-                                                    <span class="badge badge-success">Authorized</span>
-                                                @endif
+                                                @switch($request->authorization_status)
+                                                    @case($request->authorization_status = 'APPROVED')
+                                                        <span class="badge badge-success">Authorized</span>
+                                                    @break
+                                                    @case($request->authorization_status = 'CANCELLED')
+                                                        <span class="badge badge-danger">Authorized</span>
+                                                    @break
+                                                    @default
+                                                        <span class="badge badge-warning">Pending</span>
+                                                @endswitch
                                             </td>
                                             <td>
                                                 @if ($request->confirmation_status == 0)
