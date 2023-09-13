@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\ConfirmationRequest;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
-use Carbon\Carbon;
 
 class Signature
 {

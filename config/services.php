@@ -30,4 +30,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'signnow' => [
+        'api_key' => env('SIGNNOW_CLIENT_ID'),
+        'api_secret' => env('SIGNNOW_CLIENT_SECRET'),
+        'api_url' => env('SIGNNOW_API_BASE_URL'),
+        'token' => env('SIGNNOW_TOKEN')
+    ],
+
 ];

@@ -7,9 +7,11 @@ use \App\Http\Controllers\SetupController;
 use \App\Http\Controllers\ValidationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ConfirmationRequestController;
+use App\Http\Controllers\DocusignController;
 use App\Http\Controllers\HelpCenterController;
 use App\Http\Controllers\OtpController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SignatureController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -74,3 +76,9 @@ Route::group(['middleware' => ['auth', 'admin', 'block']], function () {
 Route::get('/test', function(){
     return view('layouts.otp_validation');
 });
+
+
+Route::get('docusign/callback',[DocusignController::class,'callback'])->name('docusign.callback');
+Route::get('docusign',[DocusignController::class, 'index'])->name('docusign');
+Route::get('connect-docusign',[DocusignController::class, 'connectDocusign'])->name('connect.docusign');
+Route::get('sign-document',[DocusignController::class,'signDocument'])->name('docusign.sign');
