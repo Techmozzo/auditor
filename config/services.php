@@ -37,4 +37,14 @@ return [
         'token' => env('SIGNNOW_TOKEN')
     ],
 
+
+    'docusign' => [
+        'impersonated_user_id' => env('DS_IMPERSONATED_USER_ID'),
+        'jwt_scope' => env('DS_JWT_SCOPE'),
+        'auth_server' => env('DS_AUTH_SERVER'),
+        'esign_uri_suffix' => env('DS_ESIGN_URI_SUFFIX'),
+        'key_path' => env('DS_KEY_PATH'),
+        'client_id' => env('DS_CLIENT_ID')
+    ]
+
 ];

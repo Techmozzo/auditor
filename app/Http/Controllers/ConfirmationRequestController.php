@@ -8,6 +8,7 @@ use App\Jobs\ConfirmationRequestJob;
 use App\Models\Bank;
 use App\Models\ConfirmationRequest;
 use App\Models\Signatory;
+use App\Services\DocuSign;
 use App\Services\Otp;
 use App\Services\Signature;
 use Carbon\Carbon;
@@ -80,11 +81,18 @@ class ConfirmationRequestController extends Controller
                     'phone' => $request->signatory_phone[$key],
                     'token' => rand(100000, 999999)
                 ]);
-                ConfirmationRequestJob::dispatch($auditor, $signatory, $confirmation_request);
+                // ConfirmationRequestJob::dispatch($auditor, $signatory, $confirmation_request);
             }
 
+            $signature_request = new DocuSign();
             $file = Signature::generatePdf($confirmation_request);
-            $confirmation_request->update(['file' => $file]);
+            $confirmation_request->update(['file' => $file['name']]);
+
+            $signature_request->send([
+                ...$file,
+                'signatories' => $confirmation_request->signatory,
+                'confirmation_request_id' => $confirmation_request->id
+            ]);
 
             DB::commit();
         } catch (Throwable $t) {
