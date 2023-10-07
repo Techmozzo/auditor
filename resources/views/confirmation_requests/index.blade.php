@@ -42,22 +42,39 @@
                                             <td>{{ $request->auditor->name() }}</td>
                                             <td>
                                                 @switch($request->authorization_status)
-                                                    @case($request->authorization_status = 'APPROVED')
-                                                        <span class="badge badge-success">Authorized</span>
+                                                    @case($request->authorization_status == 'APPROVED')
+                                                        <span class="badge badge-success">APPROVED</span>
                                                     @break
-                                                    @case($request->authorization_status = 'CANCELLED')
-                                                        <span class="badge badge-danger">Authorized</span>
+
+                                                    @case($request->authorization_status == 'CANCELLED')
+                                                        <span class="badge badge-danger">CANCELLED</span>
                                                     @break
+
+                                                    @case($request->authorization_status == 'DECLINED')
+                                                        <span class="badge badge-danger">DECLINED</span>
+                                                    @break
+
                                                     @default
-                                                        <span class="badge badge-warning">Pending</span>
+                                                        <span class="badge badge-warning">PENDING</span>
                                                 @endswitch
                                             </td>
                                             <td>
-                                                @if ($request->confirmation_status == 0)
-                                                    <span class="badge badge-warning">Pending</span>
-                                                @elseif ($request->confirmation_status == 1)
-                                                    <span class="badge badge-success">Completed</span>
-                                                @endif
+                                                @switch($request->confirmation_status)
+                                                    @case($request->confirmation_status == 'APPROVED')
+                                                        <span class="badge badge-success">APPROVED</span>
+                                                    @break
+
+                                                    @case($request->confirmation_status == 'CANCELLED')
+                                                        <span class="badge badge-danger">CANCELLED</span>
+                                                    @break
+
+                                                    @case($request->confirmation_status == 'DECLINED')
+                                                        <span class="badge badge-danger">DECLINED</span>
+                                                    @break
+
+                                                    @default
+                                                        <span class="badge badge-warning">PENDING</span>
+                                                @endswitch
                                             </td>
                                             <td>
                                                 <a href="{{ url('/confirmation-requests/' . encrypt_helper($request->id) . '/edit') }}"

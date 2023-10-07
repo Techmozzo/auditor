@@ -40,7 +40,7 @@
                                             <div>
                                                 <p class="m-0">Num. of Pending Requests</p>
                                                 <div class="card-title m-0">
-                                                    {{$number_of_pending_requests}}</div>
+                                                    {{ $number_of_pending_requests }}</div>
                                             </div>
                                             <i class="material-icons text-warning">pending_actions</i>
                                         </div>
@@ -100,30 +100,47 @@
                                             <td>{{ $request->auditor->name() }}</td>
                                             <td>
                                                 @switch($request->authorization_status)
-                                                    @case($request->authorization_status = 'APPROVED')
-                                                        <span class="badge badge-success">Authorized</span>
+                                                    @case($request->authorization_status == 'APPROVED')
+                                                        <span class="badge badge-success">APPROVED</span>
                                                     @break
-                                                    @case($request->authorization_status = 'CANCELLED')
-                                                        <span class="badge badge-danger">Authorized</span>
+
+                                                    @case($request->authorization_status == 'CANCELLED')
+                                                        <span class="badge badge-danger">CANCELLED</span>
                                                     @break
+
+                                                    @case($request->authorization_status == 'DECLINED')
+                                                        <span class="badge badge-danger">DECLINED</span>
+                                                    @break
+
                                                     @default
-                                                        <span class="badge badge-warning">Pending</span>
+                                                        <span class="badge badge-warning">PENDING</span>
                                                 @endswitch
                                             </td>
                                             <td>
-                                                @if ($request->confirmation_status == 0)
-                                                    <span class="badge badge-warning">Pending</span>
-                                                @elseif ($request->confirmation_status == 1)
-                                                    <span class="badge badge-success">Completed</span>
-                                                @endif
+                                                @switch($request->confirmation_status)
+                                                    @case($request->confirmation_status == 'APPROVED')
+                                                        <span class="badge badge-success">APPROVED</span>
+                                                    @break
+
+                                                    @case($request->confirmation_status == 'CANCELLED')
+                                                        <span class="badge badge-danger">CANCELLED</span>
+                                                    @break
+
+                                                    @case($request->confirmation_status == 'DECLINED')
+                                                        <span class="badge badge-danger">DECLINED</span>
+                                                    @break
+
+                                                    @default
+                                                        <span class="badge badge-warning">PENDING</span>
+                                                @endswitch
                                             </td>
                                             <td>
                                                 <a href="{{ url('/confirmation-requests/' . encrypt_helper($request->id) . '/edit') }}"
                                                     title="Edit request"><span class="material-icons">edit_note</span></a>
                                                 &nbsp;
-                                                <a class="text-primary" href="{{route('confirmation-requests.show', encrypt_helper($request->id))}}"
-                                                    title="View request"><span
-                                                        class="material-icons">visibility</span></a>
+                                                <a class="text-primary"
+                                                    href="{{ route('confirmation-requests.show', encrypt_helper($request->id)) }}"
+                                                    title="View request"><span class="material-icons">visibility</span></a>
                                                 &nbsp;
                                                 <a class="delete-item text-danger"
                                                     data-id="{{ encrypt_helper($request->id) }}" href="#"
