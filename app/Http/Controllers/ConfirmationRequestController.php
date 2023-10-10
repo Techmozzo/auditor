@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ConfirmationRequest as RequestsConfirmationRequest;
 use App\Http\Requests\ConfirmRequestTokenValidationRequest;
+use App\Interfaces\Types;
 use App\Jobs\ConfirmationRequestJob;
+use App\Jobs\DeclinedConfirmationRequestJob;
+use App\Jobs\NudgeBankJob;
+use App\Jobs\NudgeSignatoryJob;
 use App\Models\Bank;
 use App\Models\ConfirmationRequest;
 use App\Models\Signatory;
@@ -86,12 +90,17 @@ class ConfirmationRequestController extends Controller
 
             $signature_request = new DocuSign();
             $file = Signature::generatePdf($confirmation_request);
-            $confirmation_request->update(['file' => $file['name']]);
 
-            $signature_request->send([
+            $envelop =  $signature_request->send([
                 ...$file,
                 'signatories' => $confirmation_request->signatory,
                 'confirmation_request_id' => $confirmation_request->id
+            ]);
+
+            $confirmation_request->update([
+                'file' => $file['name'],
+                'envelop_id' => $envelop['envelop_id'],
+                'envelop_url' => $envelop['url']
             ]);
 
             DB::commit();
@@ -118,40 +127,6 @@ class ConfirmationRequestController extends Controller
         $years = getYearsInStringFormat(getYearsInRange($confirmation_request->opening_period, $confirmation_request->closing_period));
         $period = getPeriodDayAndMonth($confirmation_request->opening_period) . ' ' . $years;
         return view('confirmation_requests.show.auditor', compact('confirmation_request', 'period'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\ConfirmationRequest  $confirmationRequest
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ConfirmationRequest $confirmationRequest)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ConfirmationRequest  $confirmationRequest
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, ConfirmationRequest $confirmationRequest)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\ConfirmationRequest  $confirmationRequest
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(ConfirmationRequest $confirmationRequest)
-    {
-        //
     }
 
     public function viewRequest($id, $signatory_id)
@@ -192,5 +167,39 @@ class ConfirmationRequestController extends Controller
         }
         $action = route('request.sign', ['id' => $id, 'signatory' => $signatory_id]);
         return view('layouts.otp_validation', compact('confirmation_request', 'signatory', 'action'));
+    }
+
+
+    public function callback(Request $request)
+    {
+        $confirmation_request = ConfirmationRequest::where('envelop_id', $request->envelop_id)->first();
+        if ($confirmation_request) {
+            if ($request->eventType == 'EnvelopeComplete') {
+                $confirmation_request->update(['authorization_status' => Types::STATUS['APPROVED']]);
+                NudgeBankJob::dispatch($confirmation_request->auditor, $confirmation_request->bank, $confirmation_request);
+            } else {
+                $signatory = Signatory::where([['confirmation_request_id', $confirmation_request->id], ['email', $request->recipient['email']]])->first();
+                if($signatory){
+                    if ($request->eventType == 'EnvelopeSigned') {
+                        $signatory->update(['status' => Types::STATUS['APPROVED'], 'signed_at' => $request->recipient['signedDateTime']]);
+                    } elseif ($request->eventType == 'EnvelopeDeclined') {
+                        $signatory->update(['status' => Types::STATUS['DECLINED'], 'signed_at' => $request->recipient['declinedDateTime'], 'comment' => $request->recipient['declinedReason']]);
+                        $confirmation_request->update(['authorization_status' => Types::STATUS['DECLINED']]);
+                        DeclinedConfirmationRequestJob::dispatch($confirmation_request->auditor, $signatory, $confirmation_request);
+                    }
+                }
+            }
+        }
+    }
+
+    public function nudgeSignatory($id){
+        $confirmation_request = ConfirmationRequest::find(decrypt_helper($id));
+        if (!$confirmation_request) {
+            return view('layouts.404')->with(['message' => 'Confirmation Request not found.']);
+        }
+        foreach($confirmation_request->signatory as $signatory){
+            NudgeSignatoryJob::dispatch($confirmation_request->auditor, $signatory, $confirmation_request);
+        }
+        return redirect()->back()->with(['success' => 'Signatory notified successfully']);
     }
 }

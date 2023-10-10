@@ -42,7 +42,10 @@ Route::group(['middleware' => ['auth', 'block']], function () {
 
 Route::get('/{id}/email-verification', [AuditorController::class, 'verification'])->name('email.verification');
 
+Route::get('/confirmation-requests/callback',  [ConfirmationRequestController::class, 'callback']);
+
 Route::group(['middleware' => ['auth', 'block', 'company.verify']], function () {
+    Route::match(['get', 'post'], 'confirmation-requests/{id}/nudge', [ConfirmationRequestController::class, 'nudgeSignatory'])->name('nudge.signatory');
     Route::resource('confirmation-requests', ConfirmationRequestController::class);
 
     Route::post('/validation/upload', [ValidationController::class, 'upload'])->name('validation.upload');
@@ -69,8 +72,3 @@ Route::group(['middleware' => ['auth', 'admin', 'block']], function () {
     Route::resource('auditors', AuditorController::class);
 });
 // });
-
-
-Route::get('/test', function(){
-    return view('layouts.otp_validation');
-});

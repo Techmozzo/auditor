@@ -2,24 +2,17 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Validator;
-use DocuSign\eSign\Configuration;
 use DocuSign\eSign\Api\EnvelopesApi;
 use DocuSign\eSign\Client\ApiClient;
-use DocuSign\eSign\Client\ApiException;
 use DocuSign\eSign\Model\Document;
 use DocuSign\eSign\Model\SignHere;
-use DocuSign\eSign\Model\DateSigned;
-use DocuSign\eSign\Model\FullName;
 use DocuSign\eSign\Model\Tabs;
 use DocuSign\eSign\Model\Signer;
 use DocuSign\eSign\Model\Recipients;
 use DocuSign\eSign\Model\InlineTemplate;
 use DocuSign\eSign\Model\CompositeTemplate;
 use DocuSign\eSign\Model\EnvelopeDefinition;
+use DocuSign\eSign\Model\EventNotification;
 use Illuminate\Support\Facades\Log;
 
 class DocuSign
@@ -27,7 +20,7 @@ class DocuSign
     /**
      * @param Array $request
      */
-    public function send(array $request): void
+    public function send(array $request): object
     {
         /**
          *
@@ -69,6 +62,7 @@ class DocuSign
             $envelopeApi = new EnvelopesApi($apiClient);
             $result = $envelopeApi->createEnvelope($accountInfo[0]->getAccountId(), $envelopeDefenition);
             Log::info(['Send-Envelop-success' => $result]);
+            return $result;
         } catch (\Throwable $th) {
             Log::info(['Send-Envelop' => $th->getMessage()]);
         }
@@ -135,6 +129,33 @@ class DocuSign
             'email_subject' => "Audit Confirmation Request",
             'status' => "sent"
         ]);
+
+        $event_notification = new EventNotification([
+            'url' => config('app.url').'/confirmation-requests/callback', // Replace with your callback URL
+            'loggingEnabled' => 'true',
+            'requireAcknowledgment' => 'true',
+            'useSoapInterface' => 'false',
+            'includeCertificateWithSoap' => 'false',
+            'signMessageWithX509Cert' => 'false',
+            'includeDocuments' => 'false',
+            'includeEnvelopeVoidReason' => 'true',
+            'includeTimeZone' => 'true',
+            'includeSenderAccountAsCustomField' => 'true',
+            'envelopeEvents' => [
+                [
+                    'envelopeEventStatusCode' => 'completed',
+                ],
+                [
+                    'envelopeEventStatusCode' => 'signed',
+                ],
+                [
+                    'envelopeEventStatusCode' => 'declined',
+                ]
+            ],
+        ]);
+
+        // Set the EventNotification in the EnvelopeDefinition
+        $envelope_definition->setEventNotification($event_notification);
 
         return $envelope_definition;
     }

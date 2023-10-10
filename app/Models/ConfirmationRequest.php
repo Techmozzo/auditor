@@ -10,7 +10,7 @@ class ConfirmationRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name','opening_period','closing_period','auditor_id','company_id','bank_id', 'authorization_status', 'confirmation_status', 'file'
+        'name','opening_period','closing_period','auditor_id','company_id','bank_id', 'authorization_status', 'confirmation_status', 'file', 'envelop_id', 'envelop_url'
     ];
 
     public function banker(){

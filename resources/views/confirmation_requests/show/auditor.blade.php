@@ -24,7 +24,7 @@
                         <embed src="/store/confirmation_requests/{{$confirmation_request->file}}" type="application/pdf" width="100%" height="600px" />
                         <!-- Action Buttons -->
                         <div>
-                            <form action="#" method="post">
+                            <form action="{{route('nudge.signatory', ['id' => encrypt_helper($confirmation_request->id)])}}" method="post">
                                 @csrf
                                 <button type="submit" class="btn btn-opacity btn-primary btn-sm my-sm mr-sm">Nudge Signatory</button>
                             </form>
